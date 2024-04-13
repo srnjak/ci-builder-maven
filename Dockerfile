@@ -9,6 +9,10 @@ RUN apt-get update && apt-get install -y \
     gnupg2 \
     expect
 
+# Ensure the .gnupg directory exists and set appropriate permissions
+RUN mkdir -p /root/.gnupg && \
+    chmod 700 /root/.gnupg
+
 # Set GPG to use loopback mode for passphrase input
 RUN echo "use-agent" >> /root/.gnupg/gpg.conf && \
     echo "pinentry-mode loopback" >> /root/.gnupg/gpg.conf && \
@@ -16,7 +20,3 @@ RUN echo "use-agent" >> /root/.gnupg/gpg.conf && \
 
 # Restart GPG-Agent to apply configuration changes
 RUN echo RELOADAGENT | gpg-connect-agent
-
-# Ensure correct permissions on the .gnupg directory
-RUN chown -R root:root /root/.gnupg/ && \
-    chmod 700 /root/.gnupg
