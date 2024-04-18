@@ -1,4 +1,4 @@
-FROM srnjak/ci-builder:3
+FROM srnjak/ci-builder:5
 
 # Set environment variables for OpenJDK and Maven
 ARG MAVEN_VERSION=3.9.6
@@ -6,7 +6,7 @@ ARG JDK_VERSION=11
 
 # Install OpenJDK and Maven
 RUN apt-get update && \
-    apt-get install -y openjdk-$JDK_VERSION-jdk && \
+    apt-get install -y wget openjdk-$JDK_VERSION-jdk && \
     apt-get clean
 
 RUN mkdir /opt/maven && \
