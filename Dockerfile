@@ -9,6 +9,10 @@ RUN apt-get update && \
     apt-get install -y wget openjdk-$JDK_VERSION-jdk && \
     apt-get clean
 
+# Set JAVA_HOME environment variable
+ENV JAVA_HOME /usr/lib/jvm/java-$JDK_VERSION-openjdk-amd64
+ENV PATH $JAVA_HOME/bin:$PATH
+
 RUN mkdir /opt/maven && \
     wget -qO- "https://www.apache.org/dist/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz" | tar -xzC /opt/maven --strip-components=1 && \
     ln -s /opt/maven/bin/mvn /usr/bin/mvn
