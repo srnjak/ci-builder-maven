@@ -1,4 +1,4 @@
-FROM srnjak/ci-builder:5
+FROM srnjak/ci-builder:6
 
 # Set environment variables for OpenJDK and Maven
 ARG MAVEN_VERSION=3.9.6
