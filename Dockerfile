@@ -1,22 +1,24 @@
-# Use the specified Maven version as a build argument
+FROM srnjak/ci-builder:3
+
+# Set environment variables for OpenJDK and Maven
 ARG MAVEN_VERSION=3.9.6
+ARG JDK_VERSION=11
 
-FROM maven:${MAVEN_VERSION}
+# Install OpenJDK and Maven
+RUN apt-get update && \
+    apt-get install -y openjdk-$JDK_VERSION-jdk && \
+    apt-get clean
 
-# Update package lists and install SSH, GnuPG, and additional utilities
-RUN apt-get update && apt-get install -y \
-    ssh \
-    gnupg2 \
-    expect
+RUN mkdir /opt/maven && \
+    wget -qO- "https://www.apache.org/dist/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz" | tar -xzC /opt/maven --strip-components=1 && \
+    ln -s /opt/maven/bin/mvn /usr/bin/mvn
 
-# Ensure the .gnupg directory exists and set appropriate permissions
-RUN mkdir -p /root/.gnupg && \
-    chmod 700 /root/.gnupg
+# Set environment variables for Maven to reduce Maven footprint in CI logs
+ENV MAVEN_OPTS="-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn"
+ENV PATH="/opt/maven/bin:${PATH}"
 
-# Set GPG to use loopback mode for passphrase input
-RUN echo "use-agent" >> /root/.gnupg/gpg.conf && \
-    echo "pinentry-mode loopback" >> /root/.gnupg/gpg.conf && \
-    echo "allow-loopback-pinentry" >> /root/.gnupg/gpg-agent.conf
+# Set the working directory in the container (inherited from base, included here for clarity)
+WORKDIR /usr/src/app
 
-# Restart GPG-Agent to apply configuration changes
-RUN echo RELOADAGENT | gpg-connect-agent
+# Command to run when starting the container (inherited from base, included here for clarity)
+CMD ["bash"]

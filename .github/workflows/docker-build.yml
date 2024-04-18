@@ -15,6 +15,10 @@ jobs:
 
     strategy:
       matrix:
+        jdk_version:
+          - 11
+          - 17
+          - 21
         maven_version:
           - 3.9.6
 
@@ -37,6 +41,8 @@ jobs:
           docker buildx build \
             -t ${{ vars.DOCKER_HUB_USERNAME }}/ci-builder-maven:latest \
             -t ${{ vars.DOCKER_HUB_USERNAME }}/ci-builder-maven:${{ matrix.maven_version }} \
-            -t ${{ vars.DOCKER_HUB_USERNAME }}/ci-builder-maven:${{ matrix.maven_version }}-${{ github.run_number }} \
+            -t ${{ vars.DOCKER_HUB_USERNAME }}/ci-builder-maven:${{ matrix.maven_version }}-jdk${{ matrix.jdk_version }} \
+            -t ${{ vars.DOCKER_HUB_USERNAME }}/ci-builder-maven:${{ matrix.maven_version }}-jdk${{ matrix.jdk_version }}-${{ github.run_number }} \
+            --build-arg JDK_VERSION=${{ matrix.jdk_version }} \
             --build-arg MAVEN_VERSION=${{ matrix.maven_version }} \
             --push .
