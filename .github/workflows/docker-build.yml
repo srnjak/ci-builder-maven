@@ -19,6 +19,7 @@ jobs:
           - 11
           - 17
           - 21
+          - 25
         maven_version:
           - 3.9.6
 
@@ -43,7 +44,7 @@ jobs:
           RUN: ${{ github.run_number }}
           # Only this matrix leg publishes the unqualified tags (latest, <maven>),
           # otherwise parallel legs race and the last one to finish wins.
-          DEFAULT_JDK: 21
+          DEFAULT_JDK: 25
         run: |
           TAGS="-t ${IMAGE}:${MAVEN}-jdk${JDK} -t ${IMAGE}:${MAVEN}-jdk${JDK}-${RUN}"
           if [ "${JDK}" = "${DEFAULT_JDK}" ]; then
