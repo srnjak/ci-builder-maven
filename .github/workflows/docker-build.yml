@@ -36,13 +36,22 @@ jobs:
           username: ${{ vars.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
       - name: Build and push Docker image
+        env:
+          IMAGE: ${{ vars.DOCKER_HUB_USERNAME }}/ci-builder-maven
+          JDK: ${{ matrix.jdk_version }}
+          MAVEN: ${{ matrix.maven_version }}
+          RUN: ${{ github.run_number }}
+          # Only this matrix leg publishes the unqualified tags (latest, <maven>),
+          # otherwise parallel legs race and the last one to finish wins.
+          DEFAULT_JDK: 21
         run: |
+          TAGS="-t ${IMAGE}:${MAVEN}-jdk${JDK} -t ${IMAGE}:${MAVEN}-jdk${JDK}-${RUN}"
+          if [ "${JDK}" = "${DEFAULT_JDK}" ]; then
+            TAGS="${TAGS} -t ${IMAGE}:latest -t ${IMAGE}:${MAVEN}"
+          fi
           docker buildx create --use
           docker buildx build \
-            -t ${{ vars.DOCKER_HUB_USERNAME }}/ci-builder-maven:latest \
-            -t ${{ vars.DOCKER_HUB_USERNAME }}/ci-builder-maven:${{ matrix.maven_version }} \
-            -t ${{ vars.DOCKER_HUB_USERNAME }}/ci-builder-maven:${{ matrix.maven_version }}-jdk${{ matrix.jdk_version }} \
-            -t ${{ vars.DOCKER_HUB_USERNAME }}/ci-builder-maven:${{ matrix.maven_version }}-jdk${{ matrix.jdk_version }}-${{ github.run_number }} \
-            --build-arg JDK_VERSION=${{ matrix.jdk_version }} \
-            --build-arg MAVEN_VERSION=${{ matrix.maven_version }} \
+            ${TAGS} \
+            --build-arg JDK_VERSION=${JDK} \
+            --build-arg MAVEN_VERSION=${MAVEN} \
             --push .
