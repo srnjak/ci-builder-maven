@@ -21,7 +21,7 @@ jobs:
           - 21
           - 25
         maven_version:
-          - 3.9.6
+          - 3.9.16
 
     steps:
       - name: Checkout code
