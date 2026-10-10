@@ -6,7 +6,7 @@ ARG JDK_VERSION=11
 
 # Install OpenJDK and Maven
 RUN apt-get update && \
-    apt-get install -y wget openjdk-$JDK_VERSION-jdk && \
+    apt-get install -y curl wget openjdk-$JDK_VERSION-jdk && \
     apt-get clean
 
 # Set JAVA_HOME environment variable
